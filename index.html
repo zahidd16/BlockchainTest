@@ -1,0 +1,84 @@
+<html>
+
+<body>
+    <div>
+        <input type="text" id="amount">
+        <p id="balance"></p>
+        <button id="set">Set</button>
+        <button id="get">Get</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js"
+        integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+    <script>
+        var contract;
+        var ABI = [
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "x",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setVal",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getVal",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ]
+        var address = '0xdC9A77b0c6f608F816Ef29d288F686eeEE346975';
+        web3 = new Web3(web3.currentProvider);
+        contract = new web3.eth.Contract(ABI, address);
+        $(document).ready(function get() {
+            contract.methods.getVal().call().then(function (bal) {
+                $('#balance').html(bal);
+
+            })
+        })
+        $('#get').click(function () {
+            contract.methods.getVal().call().then(function (bal) {
+                $('#balance').html(bal);
+
+            })
+        })
+
+        $('#set').click(async function () {
+            const accounts = await ethereum.request({
+                method: 'eth_requestAccounts',
+            });
+
+            // Get the first account (assuming the user approves the request)
+            const acc = accounts[0];
+            // Get the value from an input element with id 'amount'
+            const value = parseInt($('#amount').val());
+
+
+            await contract.methods.setVal(value).send({ from: acc })
+                .then(function (tx) {
+                    // This code block is executed when the transaction is successful
+                    console.log(tx);
+                })
+                .catch(function (error) {
+                    // This code block is executed if there's an error with the transaction
+                    console.error(error);
+                    alert(error.message); // Display the error message in an alert
+                });
+        });
+    </script>
+</body>
+
+</html>
